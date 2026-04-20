@@ -6,17 +6,30 @@
 	objectVersion = 77;
 	objects = {
 
-/* Begin PBXFileReference section */
-		BF9144492F9566F300703A7A /* Inkydu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Inkydu.app; sourceTree = BUILT_PRODUCTS_DIR; };
-/* End PBXFileReference section */
+/* Begin PBXBuildFile section */
+		BF9144B32F9598C400703A7A /* story.json in Resources */ = {isa = PBXBuildFile; fileRef = BF9144AF2F9598C400703A7A /* story.json */; };
+		BF9144B42F9598C400703A7A /* StoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B12F9598C400703A7A /* StoryPage.swift */; };
+		BF9144B52F9598C400703A7A /* TeacherResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B22F9598C400703A7A /* TeacherResponses.swift */; };
+		BF9144B62F9598C400703A7A /* StoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B02F9598C400703A7A /* StoryController.swift */; };
+		BF9144BA2F9598DD00703A7A /* InkyduApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B72F9598DD00703A7A /* InkyduApp.swift */; };
+		BF9144BB2F9598DD00703A7A /* MicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B82F9598DD00703A7A /* MicManager.swift */; };
+		BF9144BC2F9598DD00703A7A /* NarrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B92F9598DD00703A7A /* NarrationManager.swift */; };
+		BF9144BE2F9598F300703A7A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144BD2F9598F300703A7A /* ContentView.swift */; };
+		BF9144C02F95990A00703A7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF9144BF2F95990A00703A7A /* Assets.xcassets */; };
+/* End PBXBuildFile section */
 
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		BF91444B2F9566F300703A7A /* Inkydu */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = Inkydu;
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
+/* Begin PBXFileReference section */
+		BF9144492F9566F300703A7A /* Inkydu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Inkydu.app; path = "/Users/Riley/Desktop/Inkydu/Inkydu App/Inkydu/build/Debug-iphoneos/Inkydu.app"; sourceTree = "<absolute>"; };
+		BF9144AF2F9598C400703A7A /* story.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = story.json; sourceTree = "<group>"; };
+		BF9144B02F9598C400703A7A /* StoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryController.swift; sourceTree = "<group>"; };
+		BF9144B12F9598C400703A7A /* StoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPage.swift; sourceTree = "<group>"; };
+		BF9144B22F9598C400703A7A /* TeacherResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherResponses.swift; sourceTree = "<group>"; };
+		BF9144B72F9598DD00703A7A /* InkyduApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkyduApp.swift; sourceTree = "<group>"; };
+		BF9144B82F9598DD00703A7A /* MicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicManager.swift; sourceTree = "<group>"; };
+		BF9144B92F9598DD00703A7A /* NarrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NarrationManager.swift; sourceTree = "<group>"; };
+		BF9144BD2F9598F300703A7A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		BF9144BF2F95990A00703A7A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		BF9144462F9566F300703A7A /* Frameworks */ = {
@@ -32,17 +45,24 @@
 		BF9144402F9566F300703A7A = {
 			isa = PBXGroup;
 			children = (
-				BF91444B2F9566F300703A7A /* Inkydu */,
-				BF91444A2F9566F300703A7A /* Products */,
+				BF9144AE2F95987700703A7A /* Inkydu */,
 			);
 			sourceTree = "<group>";
 		};
-		BF91444A2F9566F300703A7A /* Products */ = {
+		BF9144AE2F95987700703A7A /* Inkydu */ = {
 			isa = PBXGroup;
 			children = (
-				BF9144492F9566F300703A7A /* Inkydu.app */,
+				BF9144BF2F95990A00703A7A /* Assets.xcassets */,
+				BF9144BD2F9598F300703A7A /* ContentView.swift */,
+				BF9144B72F9598DD00703A7A /* InkyduApp.swift */,
+				BF9144B82F9598DD00703A7A /* MicManager.swift */,
+				BF9144B92F9598DD00703A7A /* NarrationManager.swift */,
+				BF9144AF2F9598C400703A7A /* story.json */,
+				BF9144B02F9598C400703A7A /* StoryController.swift */,
+				BF9144B12F9598C400703A7A /* StoryPage.swift */,
+				BF9144B22F9598C400703A7A /* TeacherResponses.swift */,
 			);
-			name = Products;
+			path = Inkydu;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -59,9 +79,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				BF91444B2F9566F300703A7A /* Inkydu */,
 			);
 			name = Inkydu;
 			packageProductDependencies = (
@@ -82,6 +99,7 @@
 				TargetAttributes = {
 					BF9144482F9566F300703A7A = {
 						CreatedOnToolsVersion = 26.2;
+						LastSwiftMigration = 2620;
 					};
 				};
 			};
@@ -95,7 +113,7 @@
 			mainGroup = BF9144402F9566F300703A7A;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = BF91444A2F9566F300703A7A /* Products */;
+			productRefGroup = BF9144402F9566F300703A7A;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -109,6 +127,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF9144C02F95990A00703A7A /* Assets.xcassets in Resources */,
+				BF9144B32F9598C400703A7A /* story.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -119,6 +139,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BF9144BE2F9598F300703A7A /* ContentView.swift in Sources */,
+				BF9144B42F9598C400703A7A /* StoryPage.swift in Sources */,
+				BF9144B52F9598C400703A7A /* TeacherResponses.swift in Sources */,
+				BF9144B62F9598C400703A7A /* StoryController.swift in Sources */,
+				BF9144BA2F9598DD00703A7A /* InkyduApp.swift in Sources */,
+				BF9144BB2F9598DD00703A7A /* MicManager.swift in Sources */,
+				BF9144BC2F9598DD00703A7A /* NarrationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -249,10 +276,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone so the child can answer questions.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to understand spoken answers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -269,6 +299,8 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Inkydu-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -280,10 +312,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone so the child can answer questions.";
+				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to understand spoken answers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -300,6 +335,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "Inkydu-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
