@@ -1,113 +1,68 @@
 import SwiftUI
 
 struct ContentView: View {
-    enum AppStage {
-        case launch
-        case library
-        case story
-        case end
-    }
-
-    @StateObject private var controller = StoryController()
-    @StateObject private var micManager = MicManager()
-    @StateObject private var narrationManager = NarrationManager()
-
-    @State private var appStage: AppStage = .launch
-    @State private var overlayMode: OverlayMode = .hidden
-    @State private var inputEnabled = false
-    @State private var autoAdvanceTask: Task<Void, Never>?
-    @State private var questionDelayTask: Task<Void, Never>?
-    @State private var feedbackTask: Task<Void, Never>?
-    @State private var showReadyPopup = false
-    @State private var isMicEnabled = true
-
-    private let questionDelaySeconds: Double = 2.2
-    private let feedbackDisplaySeconds: Double = 3.0
+    @StateObject private var viewModel = StoryExperienceViewModel()
 
     var body: some View {
         NavigationStack {
             ZStack {
                 Color.black.ignoresSafeArea()
 
-                switch appStage {
+                switch viewModel.appStage {
                 case .launch:
                     LaunchScreen {
-                        appStage = .library
+                        viewModel.openLibrary()
                     }
                     .onAppear {
                         OrientationLock.set(.portrait)
                     }
 
                 case .library:
-                    LibraryScreen(
-                        onBookTap: {
-                            controller.loadStoryJSON(named: "story")
-                            controller.startStory()
-                            overlayMode = .hidden
-                            inputEnabled = false
-                            isMicEnabled = true
-                            showReadyPopup = true
-                            appStage = .story
-                        }
-                    )
+                    LibraryScreen {
+                        viewModel.startBook(named: "story")
+                    }
                     .onAppear {
                         OrientationLock.set(.portrait)
                     }
 
                 case .story:
-                    if let page = controller.currentPage {
+                    if let page = viewModel.currentPage {
                         StoryScreen(
                             page: page,
-                            teacherLine: controller.teacherMessage,
-                            speechStatus: storySpeechStatus,
-                            isListening: isMicEnabled,
-                            overlayMode: overlayMode,
-                            canGoBack: controller.canGoBack,
-                            canGoForward: controller.canGoForward,
-                            inputEnabled: inputEnabled,
-                            isNarrationActive: narrationManager.isSpeaking || narrationManager.isPaused,
-                            isNarrationPaused: narrationManager.isPaused,
-                            feedbackTitle: feedbackOverlayTitle,
-                            showReadyPopup: showReadyPopup,
-                            onAnswerTap: { selected in
-                                handleSubmittedAnswer(selected)
-                            },
-                            onContinueTap: {
-                                guard inputEnabled else { return }
-                                moveToNextPage()
-                            },
+                            canGoBack: viewModel.canGoBack,
+                            canGoForward: viewModel.canGoForward,
+                            isNarrationActive: viewModel.isNarrationActive,
+                            isNarrationPaused: viewModel.isNarrationPaused,
+                            isNarrationMouthOpen: viewModel.isNarrationMouthOpen,
+                            isListening: viewModel.isListening,
+                            isThinking: viewModel.isThinking,
+                            isMicrophoneMuted: viewModel.isMicrophoneMuted,
+                            liveTranscript: viewModel.liveTranscript,
+                            penguinMode: viewModel.characterMode,
+                            showReadyPopup: viewModel.showReadyPopup,
                             onRepeatTap: {
-                                replayCurrentPage()
+                                viewModel.replayCurrentPage()
                             },
                             onBackTap: {
-                                moveToPreviousPage()
+                                viewModel.moveToPreviousPage()
                             },
                             onForwardTap: {
-                                announceAndMoveToNextPage()
+                                viewModel.moveToNextPage()
                             },
                             onPausePlayTap: {
-                                togglePausePlay()
+                                viewModel.togglePausePlay()
+                            },
+                            onMuteTap: {
+                                viewModel.toggleMicrophoneMuted()
                             },
                             onReadyTap: {
-                                showReadyPopup = false
-                                startPageFlowForCurrentPage()
+                                viewModel.beginStoryPlayback()
                             },
                             onHomeTap: {
-                                returnToLibrary()
-                            },
-                            onMicToggleTap: {
-                                toggleListeningForCurrentQuestion()
-                            },
-                            onQuestionCloseTap: {
-                                closeQuestionOverlay()
+                                viewModel.returnToLibrary()
                             }
                         )
-                        .id(page.page_id)
-                        .task(id: page.page_id) {
-                            if !showReadyPopup {
-                                startPageFlow(for: page)
-                            }
-                        }
+                        .id(page.id)
                         .onAppear {
                             OrientationLock.set(.landscape)
                         }
@@ -115,7 +70,7 @@ struct ContentView: View {
 
                 case .end:
                     EndScreen {
-                        appStage = .library
+                        viewModel.openLibrary()
                     }
                     .onAppear {
                         OrientationLock.set(.portrait)
@@ -125,353 +80,6 @@ struct ContentView: View {
             .toolbar(.hidden, for: .navigationBar)
         }
     }
-
-    private var feedbackOverlayTitle: String {
-        switch overlayMode {
-        case .correctFeedback:
-            return "Correct!"
-        case .incorrectFeedback:
-            return "Hmm let's try again!"
-        case .hidden, .question:
-            return controller.feedbackTitle
-        }
-    }
-
-    private var storySpeechStatus: String {
-        if !isMicEnabled {
-            return "Microphone off"
-        }
-
-        if micManager.isListening {
-            return "Listening..."
-        }
-
-        return controller.lastHeardSpeech
-    }
-
-    private func startPageFlowForCurrentPage() {
-        guard let page = controller.currentPage else { return }
-        startPageFlow(for: page)
-    }
-
-    private func startPageFlow(for page: StoryPage) {
-        cancelPendingTasks()
-        overlayMode = .hidden
-        inputEnabled = false
-        if isMicEnabled {
-            beginAutomaticListening()
-        } else {
-            micManager.stopListening()
-        }
-        narrationManager.stop()
-        controller.prepareCurrentPageForDisplay()
-
-        narrationManager.speak(page.narration) {
-            scheduleAutoAdvance(for: page.page_id)
-            scheduleQuestionPrompt(for: page)
-        }
-    }
-
-    private func replayCurrentPage() {
-        guard let page = controller.currentPage else { return }
-
-        cancelPendingTasks()
-        overlayMode = .hidden
-        inputEnabled = false
-        if isMicEnabled {
-            beginAutomaticListening()
-        } else {
-            micManager.stopListening()
-        }
-        narrationManager.stop()
-        controller.prepareCurrentPageForDisplay()
-
-        narrationManager.speak(page.narration) {
-            scheduleAutoAdvance(for: page.page_id)
-            scheduleQuestionPrompt(for: page)
-        }
-    }
-
-    private func scheduleQuestionPrompt(for page: StoryPage) {
-        guard page.question?.isEmpty == false else {
-            inputEnabled = true
-            return
-        }
-
-        questionDelayTask?.cancel()
-        questionDelayTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(questionDelaySeconds * 1_000_000_000))
-            guard !Task.isCancelled else { return }
-
-            await MainActor.run {
-                showQuestion(for: page)
-            }
-        }
-    }
-
-    private func showQuestion(for page: StoryPage) {
-        overlayMode = .question
-        controller.clearFeedback()
-        inputEnabled = true
-
-        let optionsText = (page.choices ?? [])
-            .enumerated()
-            .map { index, choice in
-                "Option \(index + 1): \(choice)."
-            }
-            .joined(separator: " ")
-
-        let spokenText = [
-            page.question ?? "",
-            optionsText
-        ]
-        .filter { !$0.isEmpty }
-        .joined(separator: " ")
-
-        narrationManager.speak(spokenText)
-    }
-
-    private func handleSubmittedAnswer(_ selected: String) {
-        guard inputEnabled else { return }
-
-        cancelPendingTasks()
-        micManager.stopListening()
-        narrationManager.stop()
-        inputEnabled = false
-
-        controller.handleAnswer(selected)
-
-        if controller.didAnswerCurrentPageCorrectly {
-            overlayMode = .correctFeedback
-            narrationManager.speak(controller.teacherMessage)
-            handleCorrectFeedbackFlow()
-        } else {
-            overlayMode = .incorrectFeedback
-            narrationManager.speak(controller.teacherMessage)
-            handleIncorrectFeedbackFlow()
-        }
-    }
-
-    private func handleIncorrectFeedbackFlow() {
-        feedbackTask?.cancel()
-        feedbackTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(feedbackDisplaySeconds * 1_000_000_000))
-            guard !Task.isCancelled else { return }
-
-            await MainActor.run {
-                overlayMode = .question
-                inputEnabled = true
-                if isMicEnabled {
-                    beginAutomaticListening()
-                }
-            }
-        }
-    }
-
-    private func handleCorrectFeedbackFlow() {
-        feedbackTask?.cancel()
-        feedbackTask = Task {
-            try? await Task.sleep(nanoseconds: UInt64(feedbackDisplaySeconds * 1_000_000_000))
-            guard !Task.isCancelled else { return }
-
-            await MainActor.run {
-                overlayMode = .hidden
-                inputEnabled = false
-                if isMicEnabled {
-                    beginAutomaticListening()
-                }
-                scheduleAutoAdvance()
-            }
-        }
-    }
-
-    private func togglePausePlay() {
-        if narrationManager.isPaused {
-            narrationManager.resume()
-        } else if narrationManager.isSpeaking {
-            narrationManager.pause()
-        } else {
-            replayCurrentPage()
-        }
-    }
-
-    private func toggleListeningForCurrentQuestion() {
-        guard appStage == .story else { return }
-
-        isMicEnabled.toggle()
-
-        if !isMicEnabled {
-            micManager.stopListening()
-            controller.lastHeardSpeech = "Microphone off"
-            return
-        }
-
-        beginAutomaticListening()
-    }
-
-    private func beginAutomaticListening() {
-        guard isMicEnabled, appStage == .story else { return }
-        guard !micManager.isListening else { return }
-
-        micManager.startListening(
-            onReady: {
-                controller.lastHeardSpeech = ""
-            },
-            onPartialTranscript: { transcript in
-                handleLiveSpeechWhileNarrating(transcript)
-            },
-            onTranscript: { transcript in
-                handleLiveTranscript(transcript)
-            },
-            onUnavailable: { message in
-                controller.lastHeardSpeech = message
-                if isMicEnabled && appStage == .story {
-                    beginAutomaticListening()
-                }
-            }
-        )
-    }
-
-    private func handleLiveSpeechWhileNarrating(_ transcript: String) {
-        guard isMicEnabled, !transcript.isEmpty else { return }
-
-        controller.lastHeardSpeech = transcript
-
-        if narrationManager.isSpeaking {
-            narrationManager.stop()
-            autoAdvanceTask?.cancel()
-            questionDelayTask?.cancel()
-
-            if let page = controller.currentPage, page.question?.isEmpty == false {
-                overlayMode = .question
-                inputEnabled = true
-            }
-        }
-    }
-
-    private func handleLiveTranscript(_ transcript: String) {
-        guard isMicEnabled else { return }
-        controller.lastHeardSpeech = transcript
-
-        guard let page = controller.currentPage else { return }
-
-        if page.correct_answer != nil {
-            if overlayMode != .question {
-                overlayMode = .question
-            }
-            inputEnabled = true
-            handleSubmittedAnswer(transcript)
-            return
-        }
-
-        if !transcript.isEmpty {
-            narrationManager.stop()
-            controller.teacherMessage = "I heard you."
-            overlayMode = .incorrectFeedback
-
-            feedbackTask?.cancel()
-            feedbackTask = Task {
-                try? await Task.sleep(nanoseconds: UInt64(feedbackDisplaySeconds * 1_000_000_000))
-                guard !Task.isCancelled else { return }
-
-                await MainActor.run {
-                    overlayMode = .hidden
-                    if isMicEnabled && appStage == .story {
-                        beginAutomaticListening()
-                    }
-                }
-            }
-        }
-    }
-
-    private func scheduleAutoAdvance(for pageID: String? = nil) {
-        autoAdvanceTask?.cancel()
-        autoAdvanceTask = Task {
-            try? await Task.sleep(nanoseconds: 10_000_000_000)
-            guard !Task.isCancelled else { return }
-
-            await MainActor.run {
-                guard appStage == .story else { return }
-                if let pageID, controller.currentPage?.page_id != pageID { return }
-
-                if pageID != nil || controller.didAnswerCurrentPageCorrectly {
-                    moveToNextPage()
-                }
-            }
-        }
-    }
-
-    private func moveToNextPage() {
-        cancelPendingTasks()
-        narrationManager.stop()
-        if !isMicEnabled {
-            micManager.stopListening()
-        }
-        overlayMode = .hidden
-        inputEnabled = false
-
-        if controller.currentPageIndex == controller.pages.count - 1 {
-            appStage = .end
-        } else {
-            controller.goToNextPage()
-        }
-    }
-
-    private func announceAndMoveToNextPage() {
-        cancelPendingTasks()
-        narrationManager.stop()
-        if !isMicEnabled {
-            micManager.stopListening()
-        }
-        overlayMode = .hidden
-        inputEnabled = false
-
-        narrationManager.speak("next page") {
-            moveToNextPage()
-        }
-    }
-
-    private func moveToPreviousPage() {
-        cancelPendingTasks()
-        narrationManager.stop()
-        if !isMicEnabled {
-            micManager.stopListening()
-        }
-        overlayMode = .hidden
-        inputEnabled = false
-        controller.goToPreviousPage()
-    }
-
-    private func returnToLibrary() {
-        cancelPendingTasks()
-        narrationManager.stop()
-        micManager.stopListening()
-        overlayMode = .hidden
-        inputEnabled = false
-        isMicEnabled = true
-        showReadyPopup = false
-        appStage = .library
-    }
-
-    private func closeQuestionOverlay() {
-        micManager.stopListening()
-        controller.clearFeedback()
-        overlayMode = .hidden
-        inputEnabled = false
-    }
-
-    private func cancelPendingTasks() {
-        autoAdvanceTask?.cancel()
-        questionDelayTask?.cancel()
-        feedbackTask?.cancel()
-    }
-}
-
-enum OverlayMode {
-    case hidden
-    case question
-    case correctFeedback
-    case incorrectFeedback
 }
 
 struct LaunchScreen: View {
@@ -632,6 +240,11 @@ struct EndScreen: View {
             VStack(spacing: 24) {
                 Spacer()
 
+                Image("inkyduMascot")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 180, height: 180)
+
                 Text("The End!")
                     .font(.largeTitle.bold())
                     .foregroundStyle(.white)
@@ -650,38 +263,30 @@ struct EndScreen: View {
 
 struct StoryScreen: View {
     let page: StoryPage
-    let teacherLine: String
-    let speechStatus: String
-    let isListening: Bool
-    let overlayMode: OverlayMode
     let canGoBack: Bool
     let canGoForward: Bool
-    let inputEnabled: Bool
     let isNarrationActive: Bool
     let isNarrationPaused: Bool
-    let feedbackTitle: String
+    let isNarrationMouthOpen: Bool
+    let isListening: Bool
+    let isThinking: Bool
+    let isMicrophoneMuted: Bool
+    let liveTranscript: String
+    let penguinMode: PenguinAnimationMode
     let showReadyPopup: Bool
-    let onAnswerTap: (String) -> Void
-    let onContinueTap: () -> Void
     let onRepeatTap: () -> Void
     let onBackTap: () -> Void
     let onForwardTap: () -> Void
     let onPausePlayTap: () -> Void
+    let onMuteTap: () -> Void
     let onReadyTap: () -> Void
     let onHomeTap: () -> Void
-    let onMicToggleTap: () -> Void
-    let onQuestionCloseTap: () -> Void
 
     private var pausePlayIconName: String {
         if isNarrationPaused {
             return "play.fill"
         }
-
         return isNarrationActive ? "pause.fill" : "play.fill"
-    }
-
-    private var micIconName: String {
-        isListening ? "mic.fill" : "mic.slash.fill"
     }
 
     var body: some View {
@@ -705,19 +310,12 @@ struct StoryScreen: View {
                             .padding(.top, 24)
 
                         Spacer()
-
-                        MicToggleButton(
-                            systemName: micIconName,
-                            action: onMicToggleTap
-                        )
-                        .padding(.trailing, 38)
-                        .padding(.top, 24)
                     }
 
                     Spacer()
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                .zIndex(1)
+                .zIndex(2)
 
                 if canGoBack {
                     HStack {
@@ -731,6 +329,7 @@ struct StoryScreen: View {
                         Spacer()
                     }
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .zIndex(3)
                 }
 
                 if canGoForward {
@@ -745,40 +344,79 @@ struct StoryScreen: View {
                         .padding(.trailing, 52)
                     }
                     .frame(width: geometry.size.width, height: geometry.size.height)
+                    .zIndex(3)
                 }
 
                 if !showReadyPopup {
                     VStack {
                         Spacer()
 
-                        HStack(alignment: .bottom) {
-                            Image("inkyduMascot")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 228, height: 228)
-                                .padding(.leading, 18)
+                        HStack(alignment: .bottom, spacing: 16) {
+                            InkyduCharacterView(
+                                mode: penguinMode,
+                                isMouthOpen: isNarrationMouthOpen,
+                                animateEntrance: page.pageID == "1"
+                            )
+                            .padding(.leading, 18)
 
-                            Spacer()
+                            Spacer(minLength: 20)
                         }
-                        .padding(.bottom, 10)
+                        .overlay(alignment: .topLeading) {
+                            VStack(alignment: .leading, spacing: 10) {
+                                if isListening || isThinking || isMicrophoneMuted {
+                                    StoryStatusBadge(
+                                        isListening: isListening,
+                                        isThinking: isThinking,
+                                        isMicrophoneMuted: isMicrophoneMuted
+                                    )
+                                }
+
+                                if shouldShowTranscript {
+                                    TranscriptBadge(
+                                        transcript: liveTranscript,
+                                        isListening: isListening,
+                                        isThinking: isThinking
+                                    )
+                                }
+                            }
+                            .padding(.leading, 166)
+                            .padding(.bottom, 160)
+                        }
                     }
-                    .frame(width: geometry.size.width, height: geometry.size.height)
                 }
 
                 VStack {
                     Spacer()
 
-                    Button(action: onPausePlayTap) {
-                        OutlinedSymbol(
-                            systemName: pausePlayIconName,
-                            size: 20,
-                            padding: 10
-                        )
+                    HStack(spacing: 18) {
+                        Button(action: onRepeatTap) {
+                            OutlinedSymbol(
+                                systemName: "arrow.clockwise",
+                                size: 20,
+                                padding: 10
+                            )
+                        }
+
+                        Button(action: onPausePlayTap) {
+                            OutlinedSymbol(
+                                systemName: pausePlayIconName,
+                                size: 20,
+                                padding: 10
+                            )
+                        }
+
+                        Button(action: onMuteTap) {
+                            OutlinedSymbol(
+                                systemName: isMicrophoneMuted ? "mic.slash.fill" : "mic.fill",
+                                size: 20,
+                                padding: 10
+                            )
+                        }
                     }
                     .padding(.bottom, 42)
                 }
                 .frame(width: geometry.size.width, height: geometry.size.height)
-                .zIndex(1)
+                .zIndex(2)
 
                 if showReadyPopup {
                     Color.black.opacity(0.35)
@@ -788,56 +426,16 @@ struct StoryScreen: View {
                     ReadyPopup(onReadyTap: onReadyTap)
                         .padding(.horizontal, 120)
                         .zIndex(9)
-                } else if overlayMode != .hidden {
-                    Color.black.opacity(0.35)
-                        .ignoresSafeArea()
-                        .zIndex(8)
-
-                    switch overlayMode {
-                    case .question:
-                        QuestionOverlay(
-                            page: page,
-                            teacherLine: teacherLine,
-                            speechStatus: speechStatus,
-                            isListening: isListening,
-                            inputEnabled: inputEnabled,
-                            onAnswerTap: onAnswerTap,
-                            onContinueTap: onContinueTap,
-                            onRepeatTap: onRepeatTap,
-                            onCloseTap: onQuestionCloseTap
-                        )
-                        .padding(.horizontal, 54)
-                        .padding(.vertical, 24)
-                        .zIndex(9)
-
-                    case .correctFeedback:
-                        MascotFeedbackOverlay(
-                            title: feedbackTitle,
-                            imageName: "inkyduHappy",
-                            titleColor: .green
-                        )
-                        .padding(.horizontal, 120)
-                        .padding(.vertical, 70)
-                        .zIndex(9)
-
-                    case .incorrectFeedback:
-                        MascotFeedbackOverlay(
-                            title: feedbackTitle,
-                            imageName: "inkyduQuestion",
-                            titleColor: .primary
-                        )
-                        .padding(.horizontal, 120)
-                        .padding(.vertical, 70)
-                        .zIndex(9)
-
-                    case .hidden:
-                        EmptyView()
-                    }
                 }
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
         }
         .ignoresSafeArea()
+    }
+
+    private var shouldShowTranscript: Bool {
+        let cleanedTranscript = liveTranscript.trimmingCharacters(in: .whitespacesAndNewlines)
+        return !cleanedTranscript.isEmpty
     }
 }
 
@@ -846,7 +444,7 @@ struct ReadyPopup: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            Image("inkyduMascot")
+            Image("inkyduMouthClosed")
                 .resizable()
                 .scaledToFit()
                 .frame(width: 130, height: 130)
@@ -856,6 +454,11 @@ struct ReadyPopup: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.black)
 
+            Text("Inkydu will read, listen, and talk with you.")
+                .font(.headline)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.black.opacity(0.74))
+
             Button("Let's Go!") {
                 onReadyTap()
             }
@@ -863,118 +466,123 @@ struct ReadyPopup: View {
             .buttonStyle(.borderedProminent)
         }
         .padding(28)
-        .frame(maxWidth: 420)
+        .frame(maxWidth: 460)
         .background(Color.white)
         .clipShape(RoundedRectangle(cornerRadius: 30))
         .shadow(radius: 18)
     }
 }
 
-struct QuestionOverlay: View {
-    let page: StoryPage
-    let teacherLine: String
-    let speechStatus: String
+struct StoryStatusBadge: View {
     let isListening: Bool
-    let inputEnabled: Bool
-    let onAnswerTap: (String) -> Void
-    let onContinueTap: () -> Void
-    let onRepeatTap: () -> Void
-    let onCloseTap: () -> Void
+    let isThinking: Bool
+    let isMicrophoneMuted: Bool
 
     var body: some View {
-        VStack(spacing: 14) {
-            HStack {
-                Spacer()
+        HStack(spacing: 8) {
+            Image(systemName: iconName)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(iconColor)
 
-                Button(action: onCloseTap) {
-                    Image(systemName: "xmark")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundStyle(.black)
-                }
-            }
-
-            Text(page.question ?? "")
-                .font(.title2.bold())
-                .multilineTextAlignment(.center)
+            Text(statusText)
+                .font(.headline.weight(.semibold))
                 .foregroundStyle(.black)
-
-            if let choices = page.choices, !choices.isEmpty {
-                ForEach(choices, id: \.self) { choice in
-                    Button(choice) {
-                        onAnswerTap(choice)
-                    }
-                    .disabled(!inputEnabled)
-                    .font(.headline.bold())
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 10)
-                    .background(inputEnabled ? Color.blue.opacity(0.10) : Color.gray.opacity(0.18))
-                    .foregroundStyle(.black)
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
-            } else {
-                Button("Continue") {
-                    onContinueTap()
-                }
-                .disabled(!inputEnabled)
-                .font(.headline.bold())
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(inputEnabled ? Color.blue.opacity(0.10) : Color.gray.opacity(0.18))
-                .foregroundStyle(.black)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
-            }
-
-            Button("Read Page Again") {
-                onRepeatTap()
-            }
-            .font(.headline)
-            .foregroundStyle(.blue)
-
-            if !teacherLine.isEmpty {
-                Text(teacherLine)
-                    .font(.footnote.weight(.semibold))
-                    .multilineTextAlignment(.center)
-                    .foregroundStyle(.blue)
-                    .padding(.top, 4)
-            }
-
-            if !speechStatus.isEmpty {
-                Text(speechStatus)
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
         }
-        .padding(24)
-        .frame(maxWidth: 700)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 28))
-        .shadow(radius: 18)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(.white.opacity(0.94))
+        .clipShape(Capsule())
+        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
+    }
+
+    private var statusText: String {
+        if isMicrophoneMuted {
+            return "Mic Off"
+        }
+
+        if isListening {
+            return "Listening"
+        }
+
+        return "Thinking"
+    }
+
+    private var iconName: String {
+        if isMicrophoneMuted {
+            return "mic.slash.fill"
+        }
+
+        if isListening {
+            return "waveform"
+        }
+
+        return "sparkles"
+    }
+
+    private var iconColor: Color {
+        if isMicrophoneMuted {
+            return .red
+        }
+
+        if isListening {
+            return .blue
+        }
+
+        return .mint
     }
 }
 
-struct MascotFeedbackOverlay: View {
-    let title: String
-    let imageName: String
-    let titleColor: Color
+struct TranscriptBadge: View {
+    let transcript: String
+    let isListening: Bool
+    let isThinking: Bool
 
     var body: some View {
-        VStack(spacing: 18) {
-            Image(imageName)
-                .resizable()
-                .scaledToFit()
-                .frame(maxHeight: 240)
+        VStack(alignment: .leading, spacing: 6) {
+            Text(headerText)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(headerColor)
 
-            Text(title)
-                .font(.largeTitle.bold())
-                .multilineTextAlignment(.center)
-                .foregroundStyle(titleColor)
+            Text(cleanedTranscript)
+                .font(.headline.weight(.semibold))
+                .foregroundStyle(.black)
+                .multilineTextAlignment(.leading)
+                .lineLimit(3)
         }
-        .padding(28)
-        .frame(maxWidth: 520)
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 30))
-        .shadow(radius: 20)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .frame(maxWidth: 280, alignment: .leading)
+        .background(.white.opacity(0.95))
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .shadow(color: .black.opacity(0.18), radius: 14, y: 8)
+    }
+
+    private var cleanedTranscript: String {
+        transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+    }
+
+    private var headerText: String {
+        if isListening {
+            return "Inkydu Heard"
+        }
+
+        if isThinking {
+            return "Thinking About"
+        }
+
+        return "You Said"
+    }
+
+    private var headerColor: Color {
+        if isListening {
+            return .blue
+        }
+
+        if isThinking {
+            return .mint
+        }
+
+        return .teal
     }
 }
 
@@ -990,7 +598,9 @@ struct ArrowButton: View {
                 size: 28,
                 padding: 6
             )
+            .frame(width: 64, height: 64)
         }
+        .contentShape(Rectangle())
         .disabled(!isEnabled)
     }
 }
@@ -1002,21 +612,6 @@ struct HomeButton: View {
         Button(action: action) {
             OutlinedSymbol(
                 systemName: "house.fill",
-                size: 24,
-                padding: 4
-            )
-        }
-    }
-}
-
-struct MicToggleButton: View {
-    let systemName: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            OutlinedSymbol(
-                systemName: systemName,
                 size: 24,
                 padding: 4
             )

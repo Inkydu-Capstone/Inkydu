@@ -1,146 +1,114 @@
 {
-  "teacher_responses": {
-    "encouragement": ["Great job!", "Nice work!", "Awesome!", "You're doing great!"],
-    "retry": ["Try again!", "Almost!", "Give it another shot!"],
-    "fallback": ["Tap an answer to continue"]
-  },
   "pages": [
     {
       "page_id": "1",
       "narration": "The Bunnyfield and McFluff Feud: Billy Bob's Tale of Fighting, Families, and Friendship.",
-      "allowSpeech": false,
       "imageName": "page1"
     },
     {
       "page_id": "2",
-      "narration": "In Mingo County, West Virginia, lived Billy Bob's kin. He hopped down to visit them and heard a big din! A din is a loud and terrible fuss. Bunnies were shouting—it was a ruckus!",
-      "question": "Where did Billy Bob's kin live?",
-      "choices": [
-        "In Dallas, Texas",
-        "In Mingo County, West Virginia",
-        "In New York City"
-      ],
-      "correct_answer": "In Mingo County, West Virginia",
-      "allowSpeech": true,
-      "imageName": "page2"
+      "narration": "In Mingo County, West Virginia, lived Billy Bob's kin. He hopped down to visit them and heard a big din! A din is a loud and terrible fuss. Bunnies were shouting. It was a ruckus!",
+      "imageName": "page2",
+      "interaction": {
+        "prompt": "Were the bunnies quiet or loud?",
+        "expectedAnswer": "loud",
+        "answerAliases": ["noisy", "they were loud", "very loud"],
+        "choices": ["quiet", "loud"],
+        "hint": "They made a big din.",
+        "answerReveal": "They were loud and noisy.",
+        "allowFreeResponse": false,
+        "autoListen": true
+      }
     },
     {
       "page_id": "3",
       "narration": "His Bunnyfield cousins were ready to fight because their pet pig named Oinky had vanished at night! One said, who could have taken him? It must be the McFluffs. They live in Kentucky and think they are tough.",
-      "question": "What kind of animal was Oinky?",
-      "choices": ["A pig", "A cow", "A sheep"],
-      "correct_answer": "A pig",
-      "allowSpeech": true,
       "imageName": "page3"
     },
     {
       "page_id": "4",
       "narration": "Billy Bob said, let us not fight. Let's talk with them and set things right. His Bunnyfield cousins were still in a tizzy. They were shouting and pouting until some went dizzy.",
-      "question": "What does it mean to be in a tizzy?",
-      "choices": [
-        "Calm and relaxed",
-        "Upset and excited",
-        "Very sleepy"
-      ],
-      "correct_answer": "Upset and excited",
-      "allowSpeech": true,
       "imageName": "page4"
     },
     {
       "page_id": "5",
       "narration": "They went to the McFluff's garden and threw stuff around. They pulled up carrots right from the ground. A few even stuffed carrots into a sack, while Billy Bob shouted, PUT THOSE RIGHT BACK!",
-      "question": "Where did the carrots come from?",
-      "choices": ["The ground", "A tree", "A store"],
-      "correct_answer": "The ground",
-      "allowSpeech": true,
-      "imageName": "page5"
+      "imageName": "page5",
+      "interaction": {
+        "prompt": "What did they pull from the garden?",
+        "expectedAnswer": "carrots",
+        "answerAliases": ["carrot", "the carrots", "orange carrots"],
+        "choices": ["carrots", "flowers"],
+        "hint": "It was orange and crunchy.",
+        "answerReveal": "They pulled up carrots.",
+        "allowFreeResponse": false,
+        "autoListen": true
+      }
     },
     {
       "page_id": "6",
       "narration": "The Bunnyfield cousins went home still mad and none of them felt particularly glad.",
-      "question": "What does glad mean?",
-      "choices": ["Sad", "Happy", "Angry"],
-      "correct_answer": "Happy",
-      "allowSpeech": true,
       "imageName": "page6"
     },
     {
       "page_id": "7",
       "narration": "Back in Kentucky, the McFluffs wanted to fight, and some even said they might bite.",
-      "question": "Why were the McFluffs upset?",
-      "choices": [
-        "It was raining",
-        "Their carrots were taken",
-        "They lost a race"
-      ],
-      "correct_answer": "Their carrots were taken",
-      "allowSpeech": true,
       "imageName": "page7"
     },
     {
       "page_id": "8",
       "narration": "The McFluffs then came up to the Bunnyfields' land and ruined their garden with a ton of sand.",
-      "question": "Whose garden did they ruin?",
-      "choices": [
-        "The Bunnyfields'",
-        "The Bears'",
-        "The Foxes'"
-      ],
-      "correct_answer": "The Bunnyfields'",
-      "allowSpeech": true,
       "imageName": "page8"
     },
     {
       "page_id": "9",
-      "narration": "Billy Bob saw Oinky form the corner of his eye. The pig had wandered off and came back to spy. No one had taken him. He had simply run away. He thought causing trouble was one way to play!",
-      "question": "Why did Oinky run away?",
-      "choices": [
-        "He was hungry",
-        "He wanted to play",
-        "He was scared"
-      ],
-      "correct_answer": "He wanted to play",
-      "allowSpeech": true,
-      "imageName": "page9"
+      "narration": "Billy Bob saw Oinky from the corner of his eye. The pig had wandered off and came back to spy. No one had taken him. He had simply run away. He thought causing trouble was one way to play!",
+      "imageName": "page9",
+      "interaction": {
+        "prompt": "Who ran away and came back?",
+        "expectedAnswer": "Oinky",
+        "answerAliases": ["the pig", "pig", "oinky the pig"],
+        "choices": ["Oinky", "Billy Bob"],
+        "hint": "It was the pet pig.",
+        "answerReveal": "Oinky the pig ran away and came back.",
+        "allowFreeResponse": false,
+        "autoListen": true
+      }
     },
     {
       "page_id": "10",
       "narration": "Billy Bob turned to the Bunnyfields and turned to the McFluffs. He shouted, no more fighting. Enough is enough! Let's sit down and talk. Let's drink carrot juice.",
-      "question": "What did Billy Bob suggest?",
-      "choices": [
-        "Fight more",
-        "Sit and talk",
-        "Run away"
-      ],
-      "correct_answer": "Sit and talk",
-      "allowSpeech": true,
       "imageName": "page10"
     },
     {
       "page_id": "11",
       "narration": "Then the Bunnyfields and McFluffs made a big truce. A truce is when you stop fighting and become friends. The Bunnyfields and McFluffs are still pals to the end!",
-      "question": "What is a truce?",
-      "choices": [
-        "A fight",
-        "Becoming friends",
-        "A race"
-      ],
-      "correct_answer": "Becoming friends",
-      "allowSpeech": true,
-      "imageName": "page11"
+      "imageName": "page11",
+      "interaction": {
+        "prompt": "At the end, were the families fighting or friends?",
+        "expectedAnswer": "friends",
+        "answerAliases": ["pals", "they were friends", "friends now"],
+        "choices": ["fighting", "friends"],
+        "hint": "They made a truce.",
+        "answerReveal": "They became friends.",
+        "allowFreeResponse": false,
+        "autoListen": true
+      }
     },
     {
       "page_id": "12",
       "narration": "From that day on, both families held a reunion every year. They shared carrot juice, laughed, and stayed friends.",
-      "question": "What happened after they became friends?",
-      "choices": [
-        "They fought again",
-        "They had yearly reunions",
-        "They moved away"
-      ],
-      "correct_answer": "They had yearly reunions",
-      "allowSpeech": true,
-      "imageName": "page12"
+      "imageName": "page12",
+      "interaction": {
+        "prompt": "What was your favorite part of the story?",
+        "expectedAnswer": null,
+        "answerAliases": [],
+        "choices": [],
+        "hint": null,
+        "answerReveal": null,
+        "allowFreeResponse": true,
+        "autoListen": true
+      }
     }
   ]
 }

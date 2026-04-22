@@ -8,27 +8,36 @@
 
 /* Begin PBXBuildFile section */
 		BF9144B32F9598C400703A7A /* story.json in Resources */ = {isa = PBXBuildFile; fileRef = BF9144AF2F9598C400703A7A /* story.json */; };
-		BF9144B42F9598C400703A7A /* StoryPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B12F9598C400703A7A /* StoryPage.swift */; };
-		BF9144B52F9598C400703A7A /* TeacherResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B22F9598C400703A7A /* TeacherResponses.swift */; };
 		BF9144B62F9598C400703A7A /* StoryController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B02F9598C400703A7A /* StoryController.swift */; };
 		BF9144BA2F9598DD00703A7A /* InkyduApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B72F9598DD00703A7A /* InkyduApp.swift */; };
 		BF9144BB2F9598DD00703A7A /* MicManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B82F9598DD00703A7A /* MicManager.swift */; };
 		BF9144BC2F9598DD00703A7A /* NarrationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144B92F9598DD00703A7A /* NarrationManager.swift */; };
 		BF9144BE2F9598F300703A7A /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF9144BD2F9598F300703A7A /* ContentView.swift */; };
 		BF9144C02F95990A00703A7A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BF9144BF2F95990A00703A7A /* Assets.xcassets */; };
+		BFDAEBA62F98055F00DB80CA /* AITeacherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBA52F98055A00DB80CA /* AITeacherService.swift */; };
+		BFDAEBA82F9816D500DB80CA /* InkyduCharacterView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBA72F9816CE00DB80CA /* InkyduCharacterView.swift */; };
+		BFDAEBAA2F98313000DB80CA /* StoryExperienceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBA92F98312900DB80CA /* StoryExperienceViewModel.swift */; };
+		BFDAEBAC2F98319700DB80CA /* StoryModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBAB2F98319400DB80CA /* StoryModels.swift */; };
+		BFDAEBB02F984C4600DB80CA /* TeacherResponses.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBAF2F984C3400DB80CA /* TeacherResponses.swift */; };
+		BFDAEBB22F98629700DB80CA /* InkyduAIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFDAEBB12F98628E00DB80CA /* InkyduAIModels.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		BF9144492F9566F300703A7A /* Inkydu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = Inkydu.app; path = "/Users/Riley/Desktop/Inkydu/Inkydu App/Inkydu/build/Debug-iphoneos/Inkydu.app"; sourceTree = "<absolute>"; };
+		BF6043272F968E3600FBCDFD /* Inkydu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Inkydu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BF9144AF2F9598C400703A7A /* story.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = story.json; sourceTree = "<group>"; };
 		BF9144B02F9598C400703A7A /* StoryController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryController.swift; sourceTree = "<group>"; };
-		BF9144B12F9598C400703A7A /* StoryPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryPage.swift; sourceTree = "<group>"; };
-		BF9144B22F9598C400703A7A /* TeacherResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherResponses.swift; sourceTree = "<group>"; };
 		BF9144B72F9598DD00703A7A /* InkyduApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkyduApp.swift; sourceTree = "<group>"; };
 		BF9144B82F9598DD00703A7A /* MicManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MicManager.swift; sourceTree = "<group>"; };
 		BF9144B92F9598DD00703A7A /* NarrationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NarrationManager.swift; sourceTree = "<group>"; };
 		BF9144BD2F9598F300703A7A /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		BF9144BF2F95990A00703A7A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BFDAEBA52F98055A00DB80CA /* AITeacherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AITeacherService.swift; sourceTree = "<group>"; };
+		BFDAEBA72F9816CE00DB80CA /* InkyduCharacterView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkyduCharacterView.swift; sourceTree = "<group>"; };
+		BFDAEBA92F98312900DB80CA /* StoryExperienceViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryExperienceViewModel.swift; sourceTree = "<group>"; };
+		BFDAEBAB2F98319400DB80CA /* StoryModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoryModels.swift; sourceTree = "<group>"; };
+		BFDAEBAD2F9836EA00DB80CA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		BFDAEBAF2F984C3400DB80CA /* TeacherResponses.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeacherResponses.swift; sourceTree = "<group>"; };
+		BFDAEBB12F98628E00DB80CA /* InkyduAIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InkyduAIModels.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,21 +55,27 @@
 			isa = PBXGroup;
 			children = (
 				BF9144AE2F95987700703A7A /* Inkydu */,
+				BF6043272F968E3600FBCDFD /* Inkydu.app */,
 			);
 			sourceTree = "<group>";
 		};
 		BF9144AE2F95987700703A7A /* Inkydu */ = {
 			isa = PBXGroup;
 			children = (
+				BFDAEBA52F98055A00DB80CA /* AITeacherService.swift */,
+				BFDAEBAF2F984C3400DB80CA /* TeacherResponses.swift */,
+				BFDAEBAB2F98319400DB80CA /* StoryModels.swift */,
 				BF9144BF2F95990A00703A7A /* Assets.xcassets */,
 				BF9144BD2F9598F300703A7A /* ContentView.swift */,
+				BFDAEBA92F98312900DB80CA /* StoryExperienceViewModel.swift */,
+				BFDAEBB12F98628E00DB80CA /* InkyduAIModels.swift */,
+				BFDAEBA72F9816CE00DB80CA /* InkyduCharacterView.swift */,
 				BF9144B72F9598DD00703A7A /* InkyduApp.swift */,
+				BFDAEBAD2F9836EA00DB80CA /* Info.plist */,
 				BF9144B82F9598DD00703A7A /* MicManager.swift */,
 				BF9144B92F9598DD00703A7A /* NarrationManager.swift */,
 				BF9144AF2F9598C400703A7A /* story.json */,
 				BF9144B02F9598C400703A7A /* StoryController.swift */,
-				BF9144B12F9598C400703A7A /* StoryPage.swift */,
-				BF9144B22F9598C400703A7A /* TeacherResponses.swift */,
 			);
 			path = Inkydu;
 			sourceTree = "<group>";
@@ -84,7 +99,7 @@
 			packageProductDependencies = (
 			);
 			productName = Inkydu;
-			productReference = BF9144492F9566F300703A7A /* Inkydu.app */;
+			productReference = BF6043272F968E3600FBCDFD /* Inkydu.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -139,12 +154,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BFDAEBA62F98055F00DB80CA /* AITeacherService.swift in Sources */,
+				BFDAEBB02F984C4600DB80CA /* TeacherResponses.swift in Sources */,
 				BF9144BE2F9598F300703A7A /* ContentView.swift in Sources */,
-				BF9144B42F9598C400703A7A /* StoryPage.swift in Sources */,
-				BF9144B52F9598C400703A7A /* TeacherResponses.swift in Sources */,
+				BFDAEBA82F9816D500DB80CA /* InkyduCharacterView.swift in Sources */,
 				BF9144B62F9598C400703A7A /* StoryController.swift in Sources */,
+				BFDAEBAA2F98313000DB80CA /* StoryExperienceViewModel.swift in Sources */,
 				BF9144BA2F9598DD00703A7A /* InkyduApp.swift in Sources */,
+				BFDAEBB22F98629700DB80CA /* InkyduAIModels.swift in Sources */,
 				BF9144BB2F9598DD00703A7A /* MicManager.swift in Sources */,
+				BFDAEBAC2F98319700DB80CA /* StoryModels.swift in Sources */,
 				BF9144BC2F9598DD00703A7A /* NarrationManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -279,8 +298,10 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = G67GF3BH8K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Inkydu/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone so the child can answer questions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to understand spoken answers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -299,7 +320,6 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Inkydu-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
@@ -317,6 +337,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Inkydu/Info.plist;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "This app uses the microphone so the child can answer questions.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "This app uses speech recognition to understand spoken answers.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -335,7 +356,6 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Inkydu-Bridging-Header.h";
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
