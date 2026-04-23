@@ -1,30 +1,38 @@
+
+// This file holds all the phrases Inkydu is allowed to say. 
+// Apple's base library
 import Foundation
 
 struct TeacherResponses {
+    // Encourages child to tap Let's Go and start book
     private static let readyToRead = [
         "Tap Let's Go and I will read with you.",
         "Tap Let's Go and I will start the story.",
         "Tap Let's Go and I will read us the book."
     ]
 
+    // Future, when more books available
     private static let libraryPrompts = [
         "Pick a book and I will read with you.",
         "Choose a book and I will read it out loud.",
         "Pick a story and I will read with you."
     ]
 
+    // Future ^
     private static let bookUnavailable = [
         "I couldn't open that book yet.",
         "That book is not ready yet.",
         "I need a moment before I can open that book."
     ]
 
+    // End of book
     private static let storyFinished = [
         "The story is all done.",
         "We finished the story.",
         "That was the end of the book."
     ]
 
+    // When Inkydu can hear child
     private static let listeningPrompts = [
         "I'm listening.",
         "Go ahead. I'm listening.",
@@ -32,6 +40,7 @@ struct TeacherResponses {
         "I can hear you now."
     ]
 
+    // Telling child they can hear them
     private static let handsFreePrompts = [
         "You can talk any time.",
         "I can listen if you want to talk.",
@@ -39,12 +48,14 @@ struct TeacherResponses {
         "I am ready if you want to say something."
     ]
 
+    // Thinking
     private static let thinkingPrompts = [
         "Let me think.",
         "I'm thinking.",
         "Let me figure it out."
     ]
 
+    // Mic off prompts
     private static let mutedPrompts = [
         "Listening is off right now.",
         "My listening ears are off right now.",
@@ -215,6 +226,7 @@ struct TeacherResponses {
         random(from: comfortPrompts, fallback: "It's okay. We can figure it out together.")
     }
 
+    // Incorrect
     static func responseIncorrectAnswer(hint: String?) -> String {
         let prefix = random(from: retryPrefixes, fallback: "Nice try.")
         let cleanedHint = hint?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
@@ -226,6 +238,7 @@ struct TeacherResponses {
         return "\(prefix) \(cleanedHint)"
     }
 
+    //  Correct
     static func responseCorrectAnswer(for expectedAnswer: String?) -> String {
         let normalizedExpected = normalize(expectedAnswer ?? "")
 

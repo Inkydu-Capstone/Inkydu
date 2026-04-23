@@ -20,6 +20,7 @@ struct StoryPage: Codable, Identifiable, Equatable {
         case interaction
     }
 
+    // creates a story page
     init(
         pageID: String,
         narration: String,
@@ -43,6 +44,7 @@ struct StoryInteraction: Codable, Equatable {
     let allowFreeResponse: Bool
     let autoListen: Bool
 
+    // creates an interaction config
     init(
         prompt: String,
         expectedAnswer: String? = nil,
@@ -65,6 +67,7 @@ struct StoryInteraction: Codable, Equatable {
 }
 
 enum StoryInteractionFactory {
+    // returns interaction for a page
     static func resolvedInteraction(for page: StoryPage) -> StoryInteraction? {
         if let interaction = page.interaction {
             return interaction

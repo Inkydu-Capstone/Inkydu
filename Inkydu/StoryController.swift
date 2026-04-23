@@ -11,7 +11,6 @@ final class StoryController: ObservableObject {
         currentPageIndex > 0
     }
 
-    // The next button still shows on the last page so the child can reach the end screen.
     var canGoForward: Bool {
         currentPage != nil
     }

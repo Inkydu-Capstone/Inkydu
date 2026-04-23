@@ -317,6 +317,7 @@ struct StoryScreen: View {
                 .frame(width: geometry.size.width, height: geometry.size.height)
                 .zIndex(2)
 
+                // Keep the page controls above the illustration
                 if canGoBack {
                     HStack {
                         ArrowButton(
@@ -361,6 +362,7 @@ struct StoryScreen: View {
 
                             Spacer(minLength: 20)
                         }
+                        // Transcript/status floats near Inkydu instead of the page controls
                         .overlay(alignment: .topLeading) {
                             VStack(alignment: .leading, spacing: 10) {
                                 if isListening || isThinking || isMicrophoneMuted {
@@ -619,6 +621,7 @@ struct HomeButton: View {
     }
 }
 
+// Tiny fake outline for SF Symbols so controls stay readable on busy art
 struct OutlinedSymbol: View {
     let systemName: String
     let size: CGFloat

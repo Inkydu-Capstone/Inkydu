@@ -47,6 +47,7 @@ final class StoryExperienceViewModel: ObservableObject {
     private var shouldResumeNarrationAfterListening = false
     private var cancellables: Set<AnyCancellable> = []
 
+    // init sets up bindings
     init() {
         bindManagers()
     }
@@ -59,6 +60,7 @@ final class StoryExperienceViewModel: ObservableObject {
         controller.canGoForward
     }
 
+    // opens library screen
     func openLibrary() {
         stopAllAudioAndTasks()
         controller.reset()
@@ -71,6 +73,7 @@ final class StoryExperienceViewModel: ObservableObject {
         refreshCharacterMode()
     }
 
+    // starts a book
     func startBook(named fileName: String) {
         stopAllAudioAndTasks()
         controller.loadStoryJSON(named: fileName)
@@ -94,15 +97,18 @@ final class StoryExperienceViewModel: ObservableObject {
         refreshCharacterMode()
     }
 
+    // begins playback after ready
     func beginStoryPlayback() {
         showReadyPopup = false
         playCurrentPageFromStart(resetAttempts: true)
     }
 
+    // replays current page
     func replayCurrentPage() {
         playCurrentPageFromStart(resetAttempts: true)
     }
 
+    // toggles mic mute
     func toggleMicrophoneMuted() {
         isMicrophoneMuted.toggle()
 
@@ -125,6 +131,7 @@ final class StoryExperienceViewModel: ObservableObject {
         refreshCharacterMode()
     }
 
+    // handles pause/play logic
     func togglePausePlay() {
         if isListening {
             stopListeningEarly()
@@ -141,6 +148,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // moves to next page
     func moveToNextPage() {
         stopAllAudioAndTasks()
         controller.goToNextPage()
@@ -158,6 +166,7 @@ final class StoryExperienceViewModel: ObservableObject {
         playCurrentPageFromStart(resetAttempts: true)
     }
 
+    // moves to previous page
     func moveToPreviousPage() {
         guard controller.canGoBack else { return }
 
@@ -169,10 +178,12 @@ final class StoryExperienceViewModel: ObservableObject {
         playCurrentPageFromStart(resetAttempts: true)
     }
 
+    // returns to library
     func returnToLibrary() {
         openLibrary()
     }
 
+    // binds narration and mic state
     private func bindManagers() {
         narrationManager.$isSpeaking
             .receive(on: RunLoop.main)
@@ -213,6 +224,7 @@ final class StoryExperienceViewModel: ObservableObject {
             .store(in: &cancellables)
     }
 
+    // plays current page from start
     private func playCurrentPageFromStart(resetAttempts: Bool) {
         guard let page = currentPage else { return }
 
@@ -232,6 +244,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // handles after narration completes
     private func afterNarrationFinished(for page: StoryPage) {
         guard currentPage?.id == page.id else { return }
 
@@ -266,6 +279,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // starts listening for input
     private func beginListening(
         for page: StoryPage,
         source: ListeningSource = .prompt
@@ -316,6 +330,7 @@ final class StoryExperienceViewModel: ObservableObject {
         )
     }
 
+    // handles final transcript
     private func handleTranscript(_ transcript: String, for page: StoryPage) {
         guard currentPage?.id == page.id else { return }
 
@@ -350,6 +365,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // handles unavailable or empty speech
     private func handleUnavailableListening(_ message: String, for page: StoryPage) {
         guard currentPage?.id == page.id else { return }
 
@@ -395,6 +411,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // delivers AI plan
     private func deliverTurnPlan(
         _ plan: InkyduTurnPlan,
         for page: StoryPage,
@@ -417,6 +434,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // handles next step after plan
     private func afterTurnPlan(
         _ plan: InkyduTurnPlan,
         for page: StoryPage,
@@ -509,6 +527,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // stops listening early
     private func stopListeningEarly() {
         guard let page = currentPage else { return }
 
@@ -526,6 +545,7 @@ final class StoryExperienceViewModel: ObservableObject {
         )
     }
 
+    // arms hands-free speech monitor
     private func armHandsFreeMonitor(for page: StoryPage, after delay: Double = 0.35) {
         speechMonitorArmTask?.cancel()
 
@@ -548,6 +568,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // handles detected speech in hands-free mode
     private func handleHandsFreeSpeechDetected(for page: StoryPage) {
         guard currentPage?.id == page.id else { return }
         guard !isListening, !isThinking else { return }
@@ -556,6 +577,7 @@ final class StoryExperienceViewModel: ObservableObject {
         beginListening(for: page, source: .ambientMonitor)
     }
 
+    // personalizes reply with name
     private func personalizedReply(from plan: InkyduTurnPlan) -> String {
         let reply = plan.spokenReply.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !reply.isEmpty else {
@@ -570,6 +592,7 @@ final class StoryExperienceViewModel: ObservableObject {
         return "\(knownName), \(reply)"
     }
 
+    // decides if listening should retry
     private func shouldRetryListening(after message: String) -> Bool {
         let normalized = message.lowercased()
 
@@ -583,6 +606,7 @@ final class StoryExperienceViewModel: ObservableObject {
         return !blockingPhrases.contains { normalized.contains($0) }
     }
 
+    // ignores soft ambient misses
     private func shouldSilentlyIgnoreAmbientMiss(_ message: String) -> Bool {
         let normalized = message.lowercased()
 
@@ -596,6 +620,7 @@ final class StoryExperienceViewModel: ObservableObject {
         return retrySilentlyPhrases.contains { normalized.contains($0) }
     }
 
+    // resumes listening flow if needed
     private func resumeListeningFlowIfNeeded() {
         guard appStage == .story else { return }
         guard !showReadyPopup else { return }
@@ -626,6 +651,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // schedules auto page advance
     private func scheduleAutoAdvance(for pageID: String, after delay: Double) {
         cancelPendingTasks()
 
@@ -639,6 +665,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // triggers celebration animation
     private func triggerCelebration() {
         characterResetTask?.cancel()
         isCelebrating = true
@@ -652,6 +679,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // updates character animation state
     private func refreshCharacterMode() {
         if isCelebrating {
             return
@@ -668,6 +696,7 @@ final class StoryExperienceViewModel: ObservableObject {
         }
     }
 
+    // stops all audio and tasks
     private func stopAllAudioAndTasks() {
         cancelPendingTasks()
         micManager.stopListening()
@@ -679,6 +708,7 @@ final class StoryExperienceViewModel: ObservableObject {
         refreshCharacterMode()
     }
 
+    // cancels async tasks
     private func cancelPendingTasks() {
         autoAdvanceTask?.cancel()
         autoAdvanceTask = nil

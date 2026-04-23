@@ -14,6 +14,8 @@ final class MicManager: ObservableObject {
     @Published private(set) var transcript = ""
 
     private let speechRecognizer = SFSpeechRecognizer(locale: Locale(identifier: "en-US"))
+
+    // tuned by testing, balances responsiveness vs false triggers
     private let silenceTimeoutSeconds: Double = 2.2
     private let minimumListeningSeconds: Double = 1.4
     private let speechMonitorWarmupSeconds: Double = 0.55
@@ -30,6 +32,8 @@ final class MicManager: ObservableObject {
     private var silenceTimerTask: Task<Void, Never>?
     private var deliveredFinalTranscript = false
     private var listeningStartedAt: Date?
+
+    // state for passive handsfree detection
     private var isSpeechMonitorActive = false
     private var speechMonitorStartedAt: Date?
     private var speechMonitorConsecutiveHits = 0
@@ -79,6 +83,7 @@ final class MicManager: ObservableObject {
             inputNode.removeTap(onBus: 0)
             inputNode.installTap(onBus: 0, bufferSize: 1024, format: format) { [weak self] buffer, _ in
                 guard let self else { return }
+
                 let level = self.rootMeanSquareLevel(from: buffer)
                 let copiedBuffer = self.copyPCMBuffer(buffer)
 
@@ -133,9 +138,12 @@ final class MicManager: ObservableObject {
                 return
             }
 
+            // Pull in audio from just before trigger so we don't miss first word
             let prerollBuffers = consumeSpeechMonitorPrerollBuffers()
+
             stopRecognitionCapture(deactivateAudioSession: false)
             stopSpeechMonitor()
+
             transcript = ""
             deliveredFinalTranscript = false
 
@@ -192,6 +200,7 @@ final class MicManager: ObservableObject {
                         guard !self.deliveredFinalTranscript else { return }
 
                         let cleanedTranscript = self.transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+
                         self.finishCapture()
                         self.recognitionTask?.cancel()
                         self.recognitionTask = nil
@@ -236,6 +245,7 @@ final class MicManager: ObservableObject {
             isListening = true
             listeningStartedAt = Date()
             onReady()
+
             scheduleSilenceTimeout(onTranscript: onTranscript, onUnavailable: onUnavailable)
         }
     }
@@ -340,6 +350,7 @@ final class MicManager: ObservableObject {
         onUnavailable: @escaping (String) -> Void
     ) {
         silenceTimerTask?.cancel()
+
         silenceTimerTask = Task { @MainActor in
             let elapsed = Date().timeIntervalSince(listeningStartedAt ?? Date())
             let remainingMinimum = max(0, minimumListeningSeconds - elapsed)
@@ -349,6 +360,7 @@ final class MicManager: ObservableObject {
             guard !Task.isCancelled, isListening, !deliveredFinalTranscript else { return }
 
             let cleanedTranscript = transcript.trimmingCharacters(in: .whitespacesAndNewlines)
+
             finishCapture()
             recognitionTask?.cancel()
             recognitionTask = nil
@@ -377,6 +389,7 @@ final class MicManager: ObservableObject {
 
     private func configureSpeechMonitorAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
+
         if session.category != .playAndRecord {
             try session.setCategory(
                 .playAndRecord,
@@ -384,6 +397,7 @@ final class MicManager: ObservableObject {
                 options: [.defaultToSpeaker, .allowBluetoothHFP, .duckOthers]
             )
         }
+
         try session.setPreferredSampleRate(44_100)
         try session.setPreferredIOBufferDuration(0.0058)
         try session.setActive(true, options: .notifyOthersOnDeactivation)
@@ -391,11 +405,13 @@ final class MicManager: ObservableObject {
 
     private func configureRecognitionAudioSession() throws {
         let session = AVAudioSession.sharedInstance()
+
         try session.setCategory(
             .playAndRecord,
             mode: .measurement,
             options: [.defaultToSpeaker, .allowBluetoothHFP, .duckOthers]
         )
+
         try session.setPreferredSampleRate(44_100)
         try session.setPreferredIOBufferDuration(0.0058)
         try session.setActive(true, options: .notifyOthersOnDeactivation)
@@ -438,6 +454,7 @@ final class MicManager: ObservableObject {
         }
 
         let smoothing: Float = 0.12
+
         speechMonitorNoiseFloor = max(
             0.001,
             (speechMonitorNoiseFloor * (1 - smoothing)) + (level * smoothing)
@@ -455,6 +472,7 @@ final class MicManager: ObservableObject {
 
     private func consumeSpeechMonitorPrerollBuffers() -> [AVAudioPCMBuffer] {
         let cutoffDate = Date().addingTimeInterval(-speechMonitorPrerollDurationSeconds)
+
         let buffers = speechMonitorRecentBuffers
             .filter { $0.timestamp >= cutoffDate }
             .map(\.buffer)

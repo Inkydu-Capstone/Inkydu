@@ -9,6 +9,7 @@ enum AITeacherError: Error {
 }
 
 final class AITeacherService {
+    // main entry point to plan a turn
     func planTurn(
         page: StoryPage,
         childUtterance: String,
@@ -55,6 +56,7 @@ final class AITeacherService {
 
     #if canImport(FoundationModels)
     @available(iOS 26.0, *)
+    // uses the LLM to generate a turn plan
     private func planTurnWithModel(
         page: StoryPage,
         childUtterance: String,
@@ -145,6 +147,7 @@ final class AITeacherService {
     }
     #endif
 
+    // fallback logic when model is unavailable or fails
     private func fallbackPlan(
         page: StoryPage,
         childUtterance: String,
@@ -273,6 +276,7 @@ final class AITeacherService {
         )
     }
 
+    // parses JSON into turn plan
     private func parseTurnPlan(from raw: String) throws -> InkyduTurnPlan {
         let jsonString = try extractJSONObject(from: raw)
         let data = Data(jsonString.utf8)
@@ -280,6 +284,7 @@ final class AITeacherService {
         return try decoder.decode(InkyduTurnPlan.self, from: data)
     }
 
+    // extracts JSON object from raw string
     private func extractJSONObject(from raw: String) throws -> String {
         guard let startIndex = raw.firstIndex(of: "{") else {
             throw AITeacherError.invalidResponse
@@ -307,6 +312,7 @@ final class AITeacherService {
         return String(raw[startIndex...resolvedEndIndex])
     }
 
+    // fallback reply logic for conversation
     private func fallbackConversationReply(for page: StoryPage, normalizedUtterance: String) -> String {
         if let topicReply = storyTopicReply(for: normalizedUtterance) {
             return topicReply
@@ -323,6 +329,7 @@ final class AITeacherService {
         return TeacherResponses.responseGenericConversation()
     }
 
+    // Matches story topics to responses
     private func storyTopicReply(for normalizedUtterance: String) -> String? {
         if normalizedUtterance.contains("bunny") || normalizedUtterance.contains("rabbit") {
             return TeacherResponses.responseBunny()
@@ -368,10 +375,12 @@ final class AITeacherService {
         return nil
     }
 
+    // wraps topic reply for contextual use
     private func contextualStoryReply(for normalizedUtterance: String) -> String? {
         storyTopicReply(for: normalizedUtterance)
     }
 
+    // checks if answer meaning matches expected
     private func meaningMatchesExpectedAnswer(
         childUtterance: String,
         interaction: StoryInteraction
@@ -395,6 +404,7 @@ final class AITeacherService {
         }
     }
 
+    // checks if input looks like an answer attempt
     private func isLikelyAnswerAttempt(_ normalized: String, interaction: StoryInteraction) -> Bool {
         var candidates = interaction.choices
         candidates.append(contentsOf: interaction.answerAliases)
@@ -419,6 +429,7 @@ final class AITeacherService {
         return false
     }
 
+    // detects repeat requests
     private func isRepeatRequest(_ normalized: String) -> Bool {
         normalized.contains("again")
             || normalized.contains("repeat")
@@ -426,6 +437,7 @@ final class AITeacherService {
             || normalized.contains("say it again")
     }
 
+    // detects next page requests
     private func isNextPageRequest(_ normalized: String) -> Bool {
         normalized.contains("next page")
             || normalized.contains("turn the page")
@@ -433,6 +445,7 @@ final class AITeacherService {
             || normalized == "next"
     }
 
+    // detects question intent
     private func isQuestionIntent(_ normalized: String) -> Bool {
         normalized.hasPrefix("why")
             || normalized.hasPrefix("what")
@@ -441,6 +454,7 @@ final class AITeacherService {
             || normalized.hasPrefix("where")
     }
 
+    // detects emotional reactions
     private func isEmotionalReaction(_ normalized: String) -> Bool {
         normalized.contains("scared")
             || normalized.contains("sad")
@@ -449,6 +463,7 @@ final class AITeacherService {
             || normalized.contains("i dont like")
     }
 
+    // extracts child's name from utterance
     private func extractChildName(from utterance: String) -> String? {
         let lowercased = utterance.lowercased()
         let patterns = [
@@ -474,6 +489,7 @@ final class AITeacherService {
         return nil
     }
 
+    // extracts simple preferences
     private func extractPreference(from normalized: String) -> String? {
         if normalized.contains("funny") {
             return "funny parts"
@@ -494,6 +510,7 @@ final class AITeacherService {
         return nil
     }
 
+    // normalizes text for matching
     private func normalize(_ text: String) -> String {
         text
             .lowercased()
@@ -503,6 +520,7 @@ final class AITeacherService {
             .joined(separator: " ")
     }
 
+    // computes token overlap score
     private func tokenOverlapScore(lhs: String, rhs: String) -> Double {
         let lhsTokens = Set(lhs.split(separator: " ").map(String.init))
         let rhsTokens = Set(rhs.split(separator: " ").map(String.init))
@@ -515,6 +533,7 @@ final class AITeacherService {
         return Double(sharedCount) / Double(max(lhsTokens.count, rhsTokens.count))
     }
 
+    // loose matching between tokens
     private func hasLooseTokenMatch(lhs: String, rhs: String) -> Bool {
         let lhsTokens = lhs.split(separator: " ").map(String.init)
         let rhsTokens = rhs.split(separator: " ").map(String.init)

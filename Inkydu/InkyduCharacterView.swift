@@ -53,6 +53,7 @@ struct InkyduCharacterView: View {
                 isPulseExpanded = true
             }
 
+            // slide in from the left on first appearance
             if animateEntrance {
                 xOffset = -140
                 withAnimation(.interpolatingSpring(stiffness: 130, damping: 15)) {
@@ -104,6 +105,7 @@ struct InkyduCharacterView: View {
         }
     }
 
+    // subtle pulsing rings when listening
     private var listeningRings: some View {
         ZStack {
             ForEach(0..<2, id: \.self) { index in
@@ -116,6 +118,7 @@ struct InkyduCharacterView: View {
         }
     }
 
+    // simple confetti burst around the character
     private var celebrationConfetti: some View {
         ZStack {
             ForEach(0..<6, id: \.self) { index in

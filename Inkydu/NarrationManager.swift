@@ -7,6 +7,7 @@ enum NarrationStyle {
     case prompt
     case feedback
 
+    // tuned for pacing differences between narration vs prompts
     var rate: Float {
         switch self {
         case .story:
@@ -170,6 +171,7 @@ final class NarrationManager: NSObject, ObservableObject, AVSpeechSynthesizerDel
 
         guard !token.isEmpty else { return }
 
+        // Ignore punctuation tokens so the mouth doesn't flicker
         if token.rangeOfCharacter(from: .alphanumerics) == nil {
             mouthCloseTask?.cancel()
             mouthCloseTask = nil
@@ -198,13 +200,12 @@ final class NarrationManager: NSObject, ObservableObject, AVSpeechSynthesizerDel
     private func speechOptimizedText(from text: String, style: NarrationStyle) -> String {
         var spokenText = text.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // Smooth out common visual-text patterns that sound robotic in TTS.
+        // avoid awkward TTS pronunciations/pacing issues
         spokenText = spokenText.replacingOccurrences(of: " VS ", with: " versus ")
         spokenText = spokenText.replacingOccurrences(of: "&", with: " and ")
         spokenText = spokenText.replacingOccurrences(of: "McFluff's", with: "McFluffs")
         spokenText = spokenText.replacingOccurrences(of: "PUT THOSE RIGHT BACK!", with: "Put those right back!")
 
-        // Add a little extra breathing room for narration without changing the displayed text.
         spokenText = spokenText.replacingOccurrences(of: ": ", with: ". ")
         spokenText = spokenText.replacingOccurrences(of: " - ", with: ", ")
         spokenText = spokenText.replacingOccurrences(of: "—", with: ", ")
